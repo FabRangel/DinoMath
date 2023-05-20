@@ -1,101 +1,377 @@
-/* const Phaser = require("phaser");
-
 var config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    }
-
-};
-var game = new Phaser.Game(config);
-//Antes de que inicie el juego
-function preload(){ 
-    game.load.image('sky','assets/sky.png');
-}
-
-//añadir la plataforma y fondo
-function create(){ 
-    game.add.image(300,400,'sky');
-}
-
-//Cómo se mueve el jugador?
-function update(){ } 
- */
-
-var config = {
-    type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    width: window.innerWidth,
+    height: window.innerHeight,
     physics: {
-        default: 'arcade',
+        default: "arcade",
         arcade: {
             gravity: { y: 300 },
-            debug: false
-        }
+            debug: false,
+        },
     },
     scene: {
         preload: preload,
         create: create,
-        update: update
-    }
+        update: update,
+    },
 };
+var score = 0;
+var scoreText;
+var gameOver = false;
 
 var game = new Phaser.Game(config);
 const spine = this.add.spine().setDepth(5);
-const fix = this.add.rectangle(0,0,4,4, 0x000000).setDepth(5.5); 
+const fix = this.add.rectangle(0, 0, 4, 4, 0x000000).setDepth(5.5);
 
 function preload() {
-    this.load.image('background', 'assets/sky.png');
-    this.load.image('ground', 'assets/ground.png');
-    this.load.image('dino', 'assets/dino.png');
-    this.load.image('coin', 'assets/coin.png');
+    this.load.image("background", "assets/sky.png");
+    this.load.image("asalvo", "assets/plat1.png");
+    this.load.image("peligro", "assets/plat2.png");
+    this.load.image("peligro2", "assets/plat4.png");
+    this.load.image("asalvo2", "assets/plat3.png");
+    this.load.image("coin", "assets/dollar.png");
+    this.load.image("bomb", "assets/asteroid.png");
+    this.load.image("ophi", "assets/ophiw.png");
+    this.load.image("ophi1", "assets/ophiw1.png");
+    this.load.image("ophi2", "assets/ophiw2.png");
+    this.load.image("ophi3", "assets/ophiw3.png");
+    this.load.image("ophi4", "assets/ophiw4.png");
+    this.load.image("ophi5", "assets/ophiw5.png");
+    this.load.image("ophi6", "assets/ophiw6.png");
+    this.load.image("ophi7", "assets/ophiw7.png");
+    this.load.image("ophi8", "assets/ophiw8.png");
+    this.load.image("ophi9", "assets/ophiw9.png");
+    this.load.image("dead", "assets/dead.png");
+    this.load.image("dead1", "assets/dead1.png");
+    this.load.image("dead2", "assets/dead2.png");
+    this.load.image("dead3", "assets/dead3.png");
+    this.load.image("dead4", "assets/dead4.png");
+    this.load.image("dead5", "assets/dead5.png");
+    this.load.image("nube", "assets/cloud1.png");
+    this.load.image("nube2", "assets/cloud2.png");
+    this.load.image("montania", "assets/montania.png");
+    this.load.image("montania2", "assets/montania2.png");
+    this.load.image("arbol", "assets/arbol.png");
+    this.load.image("bloque", "assets/block.png");
+    this.load.image("piedrita", "assets/piedrita.png");
+    this.load.image("bloquePlat", "assets/blockPlat.png");
+    this.load.image("stone", "assets/stone.png");
+    this.load.image("plat", "assets/Plat1.png");
+    this.load.image("espinas", "assets/espinas.png");
 }
 
 function create() {
-    this.add.image(400, 300, 'background');
-    this.platforms = this.physics.add.staticGroup();
-    this.platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-
-    this.player = this.physics.add.sprite(100, 450, 'dino');
-    this.player.setBounce(0.2);
-    this.player.setCollideWorldBounds(true);
-    this.physics.add.collider(this.player, this.platforms);
-
-    this.coins = this.physics.add.group({
-        key: 'coin',
-        repeat: 10,
-        setXY: { x: 12, y: 0, stepX: 70 }
+    this.add
+        .image(this.cameras.main.centerX, this.cameras.main.centerY, "background")
+        .setScale(2);
+    //nubes
+    nubes = this.physics.add.staticGroup({
+        key: "nube",
+        repeat: 4,
+        setXY: {
+            x: 50,
+            y: 50,
+            stepX: 500,
+        },
     });
-    this.physics.add.collider(this.coins, this.platforms);
+    masNubes = this.physics.add.staticGroup({
+        key: "nube2",
+        repeat: 3,
+        setXY: {
+            x: 250,
+            y: 150,
+            stepX: 500,
+        },
+    });
+    fondo = this.physics.add.staticGroup();
+    fondo.create(200, window.innerHeight - 200, "montania");
+    fondo.create(600, window.innerHeight - 100, "montania2");
+    fondo.create(window.innerWidth - 250, window.innerHeight - 250, "arbol");
+    fondo.create(window.innerWidth - 50, window.innerHeight - 100, "piedrita");
+    //Piso
+    piso = this.physics.add.staticGroup({
+        key: "bloque",
+        repeat: 50,
+        setXY: {
+            x: 0,
+            y: window.innerHeight - 35,
+            stepX: 64,
+        },
+    });
+    //Espinas
+    espinas = this.physics.add.staticGroup();
+    espinas.create(800, window.innerHeight - 75, "espinas").setScale(0.7);
+    espinas.create(850, 260, "espinas").setScale(0.7);
+    espinas.create(10, 205, "espinas").setScale(0.7);
+    espinas.create(window.innerWidth - 50, 410, "espinas").setScale(0.7);
+    //Plataformas (estáticas)
+    platforma1 = this.physics.add.staticGroup({
+        key: "bloquePlat",
+        repeat: 3,
+        setXY: {
+            x: 300,
+            y: window.innerHeight - 250,
+            stepX: 50,
+        },
+    });
+    platforma2 = this.physics.add.staticGroup({
+        key: "bloquePlat",
+        repeat: 3,
+        setXY: {
+            x: 20,
+            y: window.innerHeight - 470,
+            stepX: 64,
+        },
+    });
+    platforma3 = this.physics.add.staticGroup();
+    platforma3.create(700, 210, "stone");
+    platforma5 = this.physics.add.staticGroup({
+        key: "bloquePlat",
+        repeat: 1,
+        setXY: {
+            x: 500,
+            y: 150,
+            stepX: 64,
+        },
+    });
+    platforma6 = this.physics.add.staticGroup({
+        key: "bloquePlat",
+        repeat: 3,
+        setXY: {
+            x: 850,
+            y: 300,
+            stepX: 64,
+        },
+    });
+    platforma4 = this.physics.add.staticGroup();
+    platforma4.create(600, window.innerHeight - 80, "stone").setScale(0.5);
+    platforma4.create(632, window.innerHeight - 80, "stone").setScale(0.5);
+    platforma4.create(664, window.innerHeight - 80, "stone").setScale(0.5);
+    platforma4.create(617, window.innerHeight - 112, "stone").setScale(0.5);
+    platforma4.create(649, window.innerHeight - 112, "stone").setScale(0.5);
+    platforma4.create(632, window.innerHeight - 144, "stone").setScale(0.5);
+    platforma7 = this.physics.add.staticGroup({
+        key: "bloquePlat",
+        repeat: 4,
+        setXY: {
+            x: 1100,
+            y: 150,
+            stepX: 64,
+        },
+    });
+    platforma8 = this.physics.add.staticGroup({
+        key: "stone",
+        repeat: 3,
+        setXY: {
+            x: window.innerWidth - 140,
+            y: 450,
+            stepX: 64,
+        },
+    });
 
-    this.physics.add.overlap(this.player, this.coins, collectCoin, null, this);
+    //Personaje
+    player = this.physics.add.sprite(100, 450, "ophi").setScale(0.1);
+    player.setCollideWorldBounds(true);
+    player.setBounce(0.4);
+    this.physics.add.collider(player, piso);
+    //Cuando el jugador se mueve a la izq
+    this.anims.create({
+        key: "left",
+        frames: [
+            { key: "ophi" },
+            { key: "ophi1" },
+            { key: "ophi2" },
+            { key: "ophi3" },
+            { key: "ophi4" },
+            { key: "ophi5" },
+        ],
+        frameRate: 10,
+        repeat: -1,
+    });
 
-    this.score = 0;
-    this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
+    //Cuando el jugador está quieto
+    this.anims.create({
+        key: "turn",
+        frames: [{ key: "ophi" }],
+        frameRate: 20,
+    });
+    //Cuando el jugador se mueve a la derecha
+    this.anims.create({
+        key: "right",
+        frames: [
+            { key: "ophi" },
+            { key: "ophi1" },
+            { key: "ophi2" },
+            { key: "ophi3" },
+            { key: "ophi4" },
+            { key: "ophi5" },
+        ],
+        frameRate: 10,
+        //La animación vuelve a empezar cuando termine
+        repeat: -1,
+    });
+    //Cuando el jugador se muere
+    this.anims.create({
+        key: "murio",
+        frames: [
+            { key: "dead" },
+            { key: "dead1" },
+            { key: "dead2" },
+            { key: "dead3" },
+            { key: "dead4" },
+            { key: "dead5" },
+        ],
+        frameRate: 10,
+        repeat: 0,
+    });
+    //variar la gravedad en Y del jugador (mayor es más pesado y cae mas rapido)
+    //Colisión entre player y plataformas
+    this.physics.add.collider(player, platforma1);
+    this.physics.add.collider(player, platforma2);
+    this.physics.add.collider(player, platforma3);
+    this.physics.add.collider(player, platforma4);
+    this.physics.add.collider(player, platforma5);
+    this.physics.add.collider(player, platforma6);
+    this.physics.add.collider(player, platforma7);
+    this.physics.add.collider(player, platforma8);
+    cursor = this.input.keyboard.createCursorKeys();
+
+    //Nuevo grupo
+    coins = this.physics.add.group({
+        key: "coin",
+        repeat: 29,
+        setXY: {
+            x: 12,
+            y: 0,
+            stepX: 50,
+        },
+    });
+    //rebote en Y de estrellas con plataformas
+    coins.children.iterate(function (child) {
+        child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+    });
+
+    this.physics.add.collider(coins, platforma1);
+    this.physics.add.collider(coins, platforma2);
+    this.physics.add.collider(coins, platforma3);
+    this.physics.add.collider(coins, platforma4);
+    this.physics.add.collider(coins, platforma5);
+    this.physics.add.collider(coins, platforma6);
+    this.physics.add.collider(coins, platforma7);
+    this.physics.add.collider(coins, platforma8);
+    this.physics.add.collider(coins, piso);
+    //Coins y player
+    this.physics.add.overlap(player, coins, collectStar, null, true);
+
+    //score
+    scoreText = this.add.text(16, 16, "Monedas: 0", {
+        fontSize: "32px",
+        fill: "#000",
+    });
+
+    //bombas
+    bombs = this.physics.add.group();
+    this.physics.add.collider(bombs, platforma1);
+    this.physics.add.collider(player, bombs, hitBomb, null, this);
+    //Espinas eviten a los coins
+    this.physics.add.collider(espinas, coins, evitarColision, null, this);
+    //Espinas contra player
+    this.physics.add.collider(player, espinas, hitEspina, null, this);
 }
 
 function update() {
-    var cursors = this.input.keyboard.createCursorKeys();
-
-    if (cursors.left.isDown) {
-        this.player.setVelocityX(-160);
-    } else if (cursors.right.isDown) {
-        this.player.setVelocityX(160);
-    } else {
-        this.player.setVelocityX(0);
+    if (gameOver) {
+        return;
     }
-
-    if (cursors.up.isDown && this.player.body.touching.down) {
-        this.player.setVelocityY(-330);
+    //El player va izq o derecho
+    if (cursor.left.isDown) {
+        player.setFlipX(false);
+        player.setVelocityX(-160);
+        player.anims.play("left", true);
+    } else if (cursor.right.isDown) {
+        player.setScale(0.1);
+        player.setFlipX(true);
+        player.setVelocityX(160);
+        player.anims.play("right", true);
+    } else {
+        player.setVelocityX(0);
+        player.anims.play("turn");
+    }
+    //El jugador salta, para que salte solo si toca plataformas: player.body.tounching.down
+    if (cursor.up.isDown) {
+        player.setVelocityY(-330);
     }
 }
 
-function collectCoin(player, coin) {
+//Funcion para coleccionar coins
+function collectStar(player, coin) {
     coin.disableBody(true, true);
-    this.score += 10;
-    this.scoreText.setText('Score: ' + this.score);
+    score += 1;
+    scoreText.setText("Monedas: " + score);
+    //Si ya no hay monedas
+    if (coins.countActive(true) === 0) {
+        //vuelve a lanzar las monedas
+        coins.children.iterate(function (child) {
+            child.enableBody(true, child.x, 0, true, true);
+        });
+        //Coordenada aleatoria al contrario del jugador
+        var x =
+            player.x < 400
+                ? Phaser.Math.Between(400, 800)
+                : Phaser.Math.Between(0, 400);
+        var bomb = bombs.create(x, 16, "bomb");
+        //Que la bomba rebote y no se salga
+        bomb.setBounce(1);
+        bomb.setCollideWorldBounds(true);
+        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+    }
+}
+
+//Función para que el juego acabe si lo toca una bomba
+function hitBomb(player, bomb) {
+    this.physics.pause();
+    player.setTint(0x9b9b9b);
+    player.anims.play("murio");
+    const graphics = this.add.graphics();
+    graphics.fillStyle(0x000000, 0.3);
+    graphics.fillRect(0, 0, game.config.width, game.config.height);
+
+    const text = this.add.text(
+        game.config.width / 2,
+        game.config.height / 2,
+        "Game Over",
+        { fontSize: "32px", fill: "#fff" }
+    );
+    text.setOrigin(0.5);
+    const restartButton = this.add.text(
+        game.config.width / 2,
+        game.config.height / 2 + 50,
+        "Restart",
+        { fontSize: "24px", fill: "#fff" }
+    );
+    restartButton.setOrigin(0.5);
+    restartButton.setInteractive();
+    gameOver = true;
+}
+//Función para que los coins eviten a las espinas
+function evitarColision(espina, coin) {
+    coin.disableBody(true, true);
+}
+//Función para que el juego acabe si lo toca una espina
+function hitEspina(player, espina) {
+    this.physics.pause();
+    player.setTint(0x9b9b9b);
+    player.anims.play("murio");
+    const graphics = this.add.graphics();
+    graphics.fillStyle(0x000000, 0.3);
+    graphics.fillRect(0, 0, game.config.width, game.config.height);
+
+    const text = this.add.text(
+        game.config.width / 2,
+        game.config.height / 2,
+        "Game Over",
+        { fontSize: "32px", fill: "#fff" }
+    );
+    text.setOrigin(0.5);
+    gameOver = true;
 }
