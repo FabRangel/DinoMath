@@ -41,8 +41,14 @@ export class Start extends Phaser.Scene{
         this.load.image("stone", "assets/stone.png");
         this.load.image("plat", "assets/Plat1.png");
         this.load.image("espinas", "assets/espinas.png");
+        //Carga de sonido
+        this.load.audio("fondo", "assets/inicioFondo.mp3");
     }
     create() {
+        //Musica
+        const music = this.sound.add("fondo", { loop: true });
+        music.play();
+        music.volume = 0.03;
         // Fondo
         this.add.image(0, 0, 'background').setScale(2).setOrigin(0);
         this.fondo = this.physics.add.staticGroup();
@@ -70,6 +76,7 @@ export class Start extends Phaser.Scene{
     }
     startGame() {
         // Iniciar la escena del juego principal
+        //music.stop();
         this.scene.start('game');
     }
 }

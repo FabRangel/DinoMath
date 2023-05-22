@@ -13,11 +13,7 @@ export class Game extends Phaser.Scene {
         this.anims.remove("right");
         this.anims.remove("murio");
         this.load.image("background", "assets/sky.png");
-        this.load.image("asalvo", "assets/plat1.png");
-        this.load.image("peligro", "assets/plat2.png");
-        this.load.image("peligro2", "assets/plat4.png");
-        this.load.image("asalvo2", "assets/plat3.png");
-        //this.load.image("coin", "assets/meat.png");
+        this.load.image("coin", "assets/meat.png");
         this.load.image("bomb", "assets/met.png");
         this.load.image("ophi", "assets/ophiw.png");
         this.load.image("ophi1", "assets/ophiw1.png");
@@ -46,7 +42,9 @@ export class Game extends Phaser.Scene {
         this.load.image("stone", "assets/stone.png");
         this.load.image("plat", "assets/Plat1.png");
         this.load.image("espinas", "assets/espinas.png");
-
+        this.load.audio("fondo1", "assets/gameFondo.mp3");
+        this.load.audio("gameOver", "assets/gameOver.wav");
+        this.load.audio("come", "assets/come.wav");
         //Cuando el jugador se mueve a la izq
         this.anims.create({
             key: "left",
@@ -251,6 +249,8 @@ export class Game extends Phaser.Scene {
                 stepX: 50,
             },
         });
+        this.coinSound = this.sound.add("come");
+        this.gameOverSound = this.sound.add("gameOver");
         //rebote en Y de estrellas con plataformas
         this.coins.children.iterate(function (child) {
             child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
@@ -344,6 +344,7 @@ export class Game extends Phaser.Scene {
     collectStar(player, coin) {
         console.log("score:" + this.scoreText);
         coin.disableBody(true, true);
+        this.coinSound.play();
         this.score += 1;
         this.scoreText.setText("Carnitas: " + this.score);
         //Checar si no ha llegado al final
@@ -374,6 +375,7 @@ export class Game extends Phaser.Scene {
         this.physics.pause();
         this.player.setTint(0x9b9b9b);
         this.player.anims.play("murio");
+        this.gameOverSound.play();
         const graphics = this.add.graphics();
         graphics.fillStyle(0x000000, 0.3);
         graphics.fillRect(0, 0, this.game.config.width, this.game.config.height);
@@ -418,10 +420,11 @@ export class Game extends Phaser.Scene {
         //coin.x -=100;
     }
     //Función para que el juego acabe si lo toca una espina
-    hitEspina(player, espina) {
+    hitEspina(player,espinas) {
         this.physics.pause();
         player.setTint(0x9b9b9b);
         player.anims.play("murio");
+        this.gameOverSound.play();
         const graphics = this.add.graphics();
         graphics.fillStyle(0x000000, 0.3);
         graphics.fillRect(0, 0, this.game.config.width, this.game.config.height);
@@ -443,7 +446,7 @@ export class Game extends Phaser.Scene {
         restartButton.setInteractive();
         restartButton.on("pointerdown", this.resetGame, this);
         const seguirButton = this.add.text(
-            this.game.config.width / 2 + 120,
+            this.game.config.width / 2 + 180,
             this.game.config.height / 2 + 35,
             "Seguir",
             { fontSize: "24px", fill: "#fff" }
