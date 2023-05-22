@@ -592,6 +592,7 @@ export class Game extends Phaser.Scene {
                         "¡Felicidades! Ya tienes conocimientos sobre la regla de 3 :D",
                         "success"
                     );
+                    this.scene.start('StartScene');
                 } else {
                     Swal.fire(
                         "Respuesta incorrecta",
