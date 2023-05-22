@@ -3,3 +3,7 @@ body{
     background: rgb(109, 181, 236);
     overflow: hidden !important;
 }
+.custom-input.swal2-input{
+    text-align: center;
+    margin: 0 auto;
+}

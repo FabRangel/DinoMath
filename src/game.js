@@ -1,18 +1,24 @@
 export class Game extends Phaser.Scene {
     constructor() {
         super({ key: "game" });
+        this.gameOver = false;
+        this.scoreText = null;
     }
-    init(){
-        this.score= 0;
+    init() {
+        this.score = 0;
     }
     preload() {
+        this.anims.remove("left");
+        this.anims.remove("turn");
+        this.anims.remove("right");
+        this.anims.remove("murio");
         this.load.image("background", "assets/sky.png");
         this.load.image("asalvo", "assets/plat1.png");
         this.load.image("peligro", "assets/plat2.png");
         this.load.image("peligro2", "assets/plat4.png");
         this.load.image("asalvo2", "assets/plat3.png");
-        this.load.image("coin", "assets/dollar.png");
-        this.load.image("bomb", "assets/asteroid.png");
+        //this.load.image("coin", "assets/meat.png");
+        this.load.image("bomb", "assets/met.png");
         this.load.image("ophi", "assets/ophiw.png");
         this.load.image("ophi1", "assets/ophiw1.png");
         this.load.image("ophi2", "assets/ophiw2.png");
@@ -40,10 +46,60 @@ export class Game extends Phaser.Scene {
         this.load.image("stone", "assets/stone.png");
         this.load.image("plat", "assets/Plat1.png");
         this.load.image("espinas", "assets/espinas.png");
+
+        //Cuando el jugador se mueve a la izq
+        this.anims.create({
+            key: "left",
+            frames: [
+                { key: "ophi" },
+                { key: "ophi1" },
+                { key: "ophi2" },
+                { key: "ophi3" },
+                { key: "ophi4" },
+                { key: "ophi5" },
+            ],
+            frameRate: 10,
+            repeat: -1,
+        });
+
+        //Cuando el jugador está quieto
+        this.anims.create({
+            key: "turn",
+            frames: [{ key: "ophi" }],
+            frameRate: 20,
+        });
+        //Cuando el jugador se mueve a la derecha
+        this.anims.create({
+            key: "right",
+            frames: [
+                { key: "ophi" },
+                { key: "ophi1" },
+                { key: "ophi2" },
+                { key: "ophi3" },
+                { key: "ophi4" },
+                { key: "ophi5" },
+            ],
+            frameRate: 10,
+            //La animación vuelve a empezar cuando termine
+            repeat: -1,
+        });
+        //Cuando el jugador se muere
+        this.anims.create({
+            key: "murio",
+            frames: [
+                { key: "dead" },
+                { key: "dead1" },
+                { key: "dead2" },
+                { key: "dead3" },
+                { key: "dead4" },
+                { key: "dead5" },
+            ],
+            frameRate: 10,
+            repeat: 0,
+        });
     }
 
     create() {
-        var gameOver = false;
         //const spine = this.add.spine().setDepth(5);
         const fix = this.add.rectangle(0, 0, 4, 4, 0x000000).setDepth(5.5);
         this.add
@@ -71,8 +127,16 @@ export class Game extends Phaser.Scene {
         this.fondo = this.physics.add.staticGroup();
         this.fondo.create(200, window.innerHeight - 200, "montania");
         this.fondo.create(600, window.innerHeight - 100, "montania2");
-        this.fondo.create(window.innerWidth - 250, window.innerHeight - 250, "arbol");
-        this.fondo.create(window.innerWidth - 50, window.innerHeight - 100, "piedrita");
+        this.fondo.create(
+            window.innerWidth - 250,
+            window.innerHeight - 250,
+            "arbol"
+        );
+        this.fondo.create(
+            window.innerWidth - 50,
+            window.innerHeight - 100,
+            "piedrita"
+        );
         //Piso
         this.piso = this.physics.add.staticGroup({
             key: "bloque",
@@ -132,9 +196,15 @@ export class Game extends Phaser.Scene {
         this.platforma4.create(600, window.innerHeight - 80, "stone").setScale(0.5);
         this.platforma4.create(632, window.innerHeight - 80, "stone").setScale(0.5);
         this.platforma4.create(664, window.innerHeight - 80, "stone").setScale(0.5);
-        this.platforma4.create(617, window.innerHeight - 112, "stone").setScale(0.5);
-        this.platforma4.create(649, window.innerHeight - 112, "stone").setScale(0.5);
-        this.platforma4.create(632, window.innerHeight - 144, "stone").setScale(0.5);
+        this.platforma4
+            .create(617, window.innerHeight - 112, "stone")
+            .setScale(0.5);
+        this.platforma4
+            .create(649, window.innerHeight - 112, "stone")
+            .setScale(0.5);
+        this.platforma4
+            .create(632, window.innerHeight - 144, "stone")
+            .setScale(0.5);
         this.platforma7 = this.physics.add.staticGroup({
             key: "bloquePlat",
             repeat: 4,
@@ -159,56 +229,6 @@ export class Game extends Phaser.Scene {
         this.player.setCollideWorldBounds(true);
         this.player.setBounce(0.4);
         this.physics.add.collider(this.player, this.piso);
-        //Cuando el jugador se mueve a la izq
-        this.anims.create({
-            key: "left",
-            frames: [
-                { key: "ophi" },
-                { key: "ophi1" },
-                { key: "ophi2" },
-                { key: "ophi3" },
-                { key: "ophi4" },
-                { key: "ophi5" },
-            ],
-            frameRate: 10,
-            repeat: -1,
-        });
-
-        //Cuando el jugador está quieto
-        this.anims.create({
-            key: "turn",
-            frames: [{ key: "ophi" }],
-            frameRate: 20,
-        });
-        //Cuando el jugador se mueve a la derecha
-        this.anims.create({
-            key: "right",
-            frames: [
-                { key: "ophi" },
-                { key: "ophi1" },
-                { key: "ophi2" },
-                { key: "ophi3" },
-                { key: "ophi4" },
-                { key: "ophi5" },
-            ],
-            frameRate: 10,
-            //La animación vuelve a empezar cuando termine
-            repeat: -1,
-        });
-        //Cuando el jugador se muere
-        this.anims.create({
-            key: "murio",
-            frames: [
-                { key: "dead" },
-                { key: "dead1" },
-                { key: "dead2" },
-                { key: "dead3" },
-                { key: "dead4" },
-                { key: "dead5" },
-            ],
-            frameRate: 10,
-            repeat: 0,
-        });
         //variar la gravedad en Y del jugador (mayor es más pesado y cae mas rapido)
         //Colisión entre player y plataformas
         this.physics.add.collider(this.player, this.platforma1);
@@ -246,23 +266,54 @@ export class Game extends Phaser.Scene {
         this.physics.add.collider(this.coins, this.platforma8);
         this.physics.add.collider(this.coins, this.piso);
         //score
-        this.scoreText = this.add.text(this,16, 16, "Monedas: 0", {
+        this.scoreText = this.add.text(16, 16, "Carnitas: 0", {
             fontSize: "32px",
             fill: "#000",
         });
         //Coins y player
-        this.physics.add.overlap(this.player, this.coins, this.scoreText,this.collectStar, this.null, this.true);
-
-        
+        console.log("score:" + this.scoreText.text);
+        this.physics.add.overlap(
+            this.player,
+            this.coins,
+            this.collectStar,
+            this.null,
+            this
+        );
 
         //bombas
         this.bombs = this.physics.add.group();
         this.physics.add.collider(this.bombs, this.platforma1);
-        this.physics.add.collider(this.player, this.bombs, this.hitBomb, null, this);
+        this.physics.add.collider(this.bombs, this.platforma2);
+        this.physics.add.collider(this.bombs, this.platforma3);
+        this.physics.add.collider(this.bombs, this.platforma4);
+        this.physics.add.collider(this.bombs, this.platforma5);
+        this.physics.add.collider(this.bombs, this.platforma6);
+        this.physics.add.collider(this.bombs, this.platforma7);
+        this.physics.add.collider(this.bombs, this.platforma8);
+        this.physics.add.collider(this.bombs, this.piso);
+        this.physics.add.collider(
+            this.player,
+            this.bombs,
+            this.hitBomb,
+            null,
+            this
+        );
         //Espinas eviten a los coins
-        this.physics.add.collider(this.espinas, this.coins, this.evitarColision, null, this);
+        this.physics.add.collider(
+            this.espinas,
+            this.coins,
+            this.evitarColision,
+            null,
+            this
+        );
         //Espinas contra player
-        this.physics.add.collider(this.player, this.espinas, this.hitEspina, null, this);
+        this.physics.add.collider(
+            this.player,
+            this.espinas,
+            this.hitEspina,
+            null,
+            this
+        );
     }
 
     update() {
@@ -291,21 +342,26 @@ export class Game extends Phaser.Scene {
 
     //Funcion para coleccionar coins
     collectStar(player, coin) {
+        console.log("score:" + this.scoreText);
         coin.disableBody(true, true);
         this.score += 1;
-        this.scoreText.setText("Monedas: " + this.score);
+        this.scoreText.setText("Carnitas: " + this.score);
+        //Checar si no ha llegado al final
+        if (this.score > 99) {
+            this.congrats();
+        }
         //Si ya no hay monedas
-        if (coins.countActive(true) === 0) {
+        if (this.coins.countActive(true) === 0) {
             //vuelve a lanzar las monedas
-            coins.children.iterate(function (child) {
+            this.coins.children.iterate(function (child) {
                 child.enableBody(true, child.x, 0, true, true);
             });
             //Coordenada aleatoria al contrario del jugador
             var x =
-            player.x < 400
+                player.x < 400
                     ? Phaser.Math.Between(400, 800)
                     : Phaser.Math.Between(0, 400);
-            var bomb = bombs.create(x, 16, "bomb");
+            var bomb = this.bombs.create(x, 16, "bomb");
             //Que la bomba rebote y no se salga
             bomb.setBounce(1);
             bomb.setCollideWorldBounds(true);
@@ -320,28 +376,46 @@ export class Game extends Phaser.Scene {
         this.player.anims.play("murio");
         const graphics = this.add.graphics();
         graphics.fillStyle(0x000000, 0.3);
-        graphics.fillRect(0, 0, game.config.width, game.config.height);
+        graphics.fillRect(0, 0, this.game.config.width, this.game.config.height);
 
         const text = this.add.text(
-            game.config.width / 2,
-            game.config.height / 2,
+            this.game.config.width / 2,
+            this.game.config.height / 2 - 50,
             "Game Over",
             { fontSize: "32px", fill: "#fff" }
         );
         text.setOrigin(0.5);
         const restartButton = this.add.text(
-            game.config.width / 2,
-            game.config.height / 2 + 50,
+            this.game.config.width / 3 + 70,
+            this.game.config.height / 2 + 40,
             "Restart",
             { fontSize: "24px", fill: "#fff" }
         );
         restartButton.setOrigin(0.5);
         restartButton.setInteractive();
-        gameOver = true;
+        restartButton.on("pointerdown", this.resetGame, this);
+        const seguirButton = this.add.text(
+            this.game.config.width / 2 + 120,
+            this.game.config.height / 2 + 35,
+            "Seguir",
+            { fontSize: "24px", fill: "#fff" }
+        );
+        seguirButton.setOrigin(0.5);
+        seguirButton.setInteractive();
+        seguirButton.on("pointerdown", this.continueGame, this);
+        // Guardar el gráfico de "Game Over" en una variable adicional
+        this.gameOverGraphics = graphics;
+        this.gameOverText = text;
+        this.restartButton = restartButton;
+        this.seguirButton = seguirButton;
+
+        this.gameOver = true;
     }
     //Función para que los coins eviten a las espinas
     evitarColision(espina, coin) {
         coin.disableBody(true, true);
+        // Evitar colisión entre coins y espinas
+        //coin.x -=100;
     }
     //Función para que el juego acabe si lo toca una espina
     hitEspina(player, espina) {
@@ -350,15 +424,182 @@ export class Game extends Phaser.Scene {
         player.anims.play("murio");
         const graphics = this.add.graphics();
         graphics.fillStyle(0x000000, 0.3);
-        graphics.fillRect(0, 0, game.config.width, game.config.height);
+        graphics.fillRect(0, 0, this.game.config.width, this.game.config.height);
 
         const text = this.add.text(
-            game.config.width / 2,
-            game.config.height / 2,
+            this.game.config.width / 2,
+            this.game.config.height / 2 - 50,
             "Game Over",
             { fontSize: "32px", fill: "#fff" }
         );
         text.setOrigin(0.5);
-        gameOver = true;
+        const restartButton = this.add.text(
+            this.game.config.width / 3 + 70,
+            this.game.config.height / 2 + 40,
+            "Restart",
+            { fontSize: "24px", fill: "#fff" }
+        );
+        restartButton.setOrigin(0.5);
+        restartButton.setInteractive();
+        restartButton.on("pointerdown", this.resetGame, this);
+        const seguirButton = this.add.text(
+            this.game.config.width / 2 + 120,
+            this.game.config.height / 2 + 35,
+            "Seguir",
+            { fontSize: "24px", fill: "#fff" }
+        );
+        seguirButton.setOrigin(0.5);
+        seguirButton.setInteractive();
+        seguirButton.on("pointerdown", this.continueGame, this);
+        // Guardar el gráfico de "Game Over" en una variable adicional
+        this.gameOverGraphics = graphics;
+        this.gameOverText = text;
+        this.restartButton = restartButton;
+        this.seguirButton = seguirButton;
+
+        this.gameOver = true;
     }
+    resetGame() {
+        this.gameOver = false;
+        this.score = 0;
+
+        // Reactivar el jugador y las monedas
+        this.player.enableBody(true, 100, 450, true, true);
+        this.coins.children.iterate(function (child) {
+            child.enableBody(true, child.x, 0, true, true);
+        });
+
+        // Reiniciar la posición y la animación del jugador
+        this.player.setPosition(100, 450);
+        this.player.setVelocityX(0);
+        this.player.anims.play("turn");
+
+        // Reiniciar el texto de puntuación
+        this.scoreText.setText("Carnitas: 0");
+
+        // Eliminar las bombas existentes
+        this.bombs.clear(true, true);
+
+        // Eliminar cualquier tintado aplicado al jugador
+        this.player.clearTint();
+
+        // Reactivar la física del juego
+        this.physics.resume();
+        // Destruir el gráfico de "Game Over"
+        this.gameOverGraphics.destroy();
+        this.gameOverText.destroy();
+        this.restartButton.destroy();
+        this.seguirButton.destroy();
+    }
+    continueGame() {
+        var respuestaCorrecta = this.score * 0.5;
+        Swal.fire({
+            title: "¡Continuar jugando!",
+            text: "Para seguir jugando, responde esta sencilla pregunta de matemáticas:\n\nSi tu dinosaurio aumenta 0.5 kilos por cada carnita que come. ¿Cuántos kilos aumentó?",
+            input: "number",
+            inputAttributes: {
+                step: 0.5,
+                maxlength: 10,
+            },
+            showCancelButton: true,
+            confirmButtonText: "Enviar",
+            showLoaderOnConfirm: true,
+            customClass: {
+                input: 'custom-input'
+            },
+            preConfirm: (respuestaUsuario) => {
+                return new Promise((resolve) => {
+                    resolve(respuestaUsuario);
+                });
+            },
+            allowOutsideClick: () => !Swal.isLoading(),
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const respuestaUsuario = result.value;
+                if (parseFloat(respuestaUsuario) === respuestaCorrecta) {
+                    Swal.fire("¡Respuesta correcta!", "Puedes seguir jugando. :D", "success").then(() => {
+                        this.seguirJuego();
+                    });
+                } else {
+                    Swal.fire("Respuesta incorrecta", "Lo siento, esa no es la respuesta correcta :C. El juego se reiniciará.", "error").then(() => {
+                        this.resetGame();
+                    });
+                }
+            }
+        });
+
+    }
+    seguirJuego() {
+        this.gameOver = false;
+        // Reactivar el jugador y las monedas
+        this.player.enableBody(true, 100, 450, true, true);
+        this.coins.children.iterate(function (child) {
+            child.enableBody(true, child.x, 0, true, true);
+        });
+
+        // Reiniciar la posición y la animación del jugador
+        this.player.setPosition(100, 450);
+        this.player.setVelocityX(0);
+        this.player.anims.play("turn");
+
+        // Eliminar cualquier tintado aplicado al jugador
+        this.player.clearTint();
+
+        // Reactivar la física del juego
+        this.physics.resume();
+        // Destruir el gráfico de "Game Over"
+        this.gameOverGraphics.destroy();
+        this.gameOverText.destroy();
+        this.restartButton.destroy();
+        this.seguirButton.destroy();
+    }
+    congrats() {
+        this.physics.pause();
+        var respuestaCorrecta = 80;
+        this.scoreText.setText("Carnitas: 100");
+        var pregunta =
+            "¡Pregunta Final!\n\n Si cada vez que el dinosaurio se come 20 carnitas aparecieran 2 meteoritos, ¿Cuántas carnitas se debe comer para que existan 8 meteoritos? \n\n\nTus carnitas: " +
+            this.score;
+
+        Swal.fire({
+            title: "¡Pregunta Final!",
+            html: pregunta,
+            input: "number",
+            inputAttributes: {
+                step: 1,
+            },
+            showCancelButton: false,
+            confirmButtonText: "Enviar",
+            showLoaderOnConfirm: true,
+            customClass: {
+                input: 'custom-input'
+            },
+            preConfirm: (respuestaUsuario) => {
+                return new Promise((resolve) => {
+                    resolve(respuestaUsuario);
+                });
+            },
+            allowOutsideClick: () => !Swal.isLoading(),
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const respuestaUsuario = result.value;
+                if (parseFloat(respuestaUsuario) === respuestaCorrecta) {
+                    Swal.fire(
+                        "¡Respuesta correcta!",
+                        "¡Felicidades! Ya tienes conocimientos sobre la regla de 3 :D",
+                        "success"
+                    );
+                } else {
+                    Swal.fire(
+                        "Respuesta incorrecta",
+                        "Lo siento, esa no es la respuesta correcta. El juego se reiniciará D:",
+                        "error"
+                    ).then(() => {
+                        this.resetGame();
+                    });
+                }
+            }
+        });
+    }
+
 }
