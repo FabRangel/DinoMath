@@ -149,7 +149,7 @@ export class Game extends Phaser.Scene {
         this.espinas = this.physics.add.staticGroup();
         this.espinas.create(800, window.innerHeight - 75, "espinas").setScale(0.7);
         this.espinas.create(850, 260, "espinas").setScale(0.7);
-        this.espinas.create(10, 205, "espinas").setScale(0.7);
+        this.espinas.create(10, 240, "espinas").setScale(0.7);
         this.espinas.create(window.innerWidth - 50, 410, "espinas").setScale(0.7);
         //Plataformas (estáticas)
         this.platforma1 = this.physics.add.staticGroup({
