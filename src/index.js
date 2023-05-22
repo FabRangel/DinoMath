@@ -13,6 +13,7 @@ const config = {
             debug: false,
         }
     }
+    /*Versión final */
 };
 var game = new Phaser.Game(config);
 

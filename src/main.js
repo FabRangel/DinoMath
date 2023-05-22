@@ -79,5 +79,6 @@ export class Start extends Phaser.Scene{
         //music.stop();
         this.scene.start('game');
     }
+    /*Versión final */
 }
 
