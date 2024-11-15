@@ -314,6 +314,15 @@ export class Game extends Phaser.Scene {
             null,
             this
         );
+
+        this.coins.children.iterate((child) => {
+            do {
+                const x = Phaser.Math.Between(12, this.cameras.main.width - 12);
+                const y = Phaser.Math.Between(0, this.cameras.main.height / 2);
+                child.setPosition(x, y);
+            } while (this.physics.overlap(child, this.espinas));
+            child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+        });
     }
 
     update() {
@@ -339,6 +348,12 @@ export class Game extends Phaser.Scene {
             this.player.setVelocityY(-330);
         }
     }
+
+    evitarColision(espina, coin) {
+        coin.destroy(); // Destruye la moneda que colisiona con la espina
+    }
+
+    
 
     //Funcion para coleccionar coins
     collectStar(player, coin) {
